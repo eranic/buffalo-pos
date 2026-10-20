@@ -1,0 +1,70 @@
+{
+  "name": "buffalo-pos",
+  "version": "1.0.1",
+  "description": "מערכת קופה / CRM / ERP - באפלו חיות מחמד",
+  "main": "main.js",
+  "author": "Buffalo",
+  "license": "UNLICENSED",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder"
+  },
+  "devDependencies": {
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.buffalo.pos",
+    "productName": "Buffalo POS",
+    "copyright": "Buffalo",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "eranic",
+        "repo": "buffalo-pos"
+      }
+    ],
+    "files": [
+      "main.js",
+      "preload.js",
+      "src/**/*"
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "artifactName": "Buffalo-POS-Setup-${version}.${ext}"
+    },
+    "portable": {
+      "artifactName": "Buffalo-POS-${version}.${ext}"
+    },
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "icon": "build/icon.png",
+      "category": "Office"
+    },
+    "mac": {
+      "target": [
+        "dmg"
+      ],
+      "icon": "build/icon.png"
+    }
+  },
+  "dependencies": {
+    "electron-updater": "^6.8.9"
+  }
+}
