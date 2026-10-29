@@ -3290,6 +3290,8 @@ const petNames=c=>((c&&c.pets)||[]).map(p=>p.name).join(', ');
 const intl=p=>{p=(p||'').replace(/\D/g,'');return p[0]=='0'?'972'+p.slice(1):p};
 const PRI=['','נמוכה','רגילה','בינונית','גבוהה','דחופה'],PC=['','#8a97a3','#2980b9','#e8a35a','#e67e22','#c0392b'],priBar=n=>{n=n||2;return`<span class=pbar title="${PRI[n]}"><i style="width:${n*20}%;background:${PC[n]}"></i></span> <small>${PRI[n]}</small>`};
 const cfg=()=>S.cfg,can=k=>{const r=S.roles[S.emps[emp].role];return r.tabs=='all'||r.perm=='all'||(Array.isArray(r.perm)&&r.perm.includes(k))};
+// canTab: בדיקה אם לתפקיד הנוכחי יש גישה לטאב מסוים - אותה בדיקה המשמשת לסינון תפריט הניווט, אך נגישה גם מפעולות שמנסות לקפוץ ישירות לטאב (כמו custToPos/dupCrm), כדי שקישור מטאב אחד לא יעקוף את הרשאות הטאבים.
+const canTab=k=>{const r=S.roles[S.emps[emp].role];return r.tabs=='all'||r.tabs.includes(k)};
 const TABS={dash:'לוח בקרה',pos:'קופה',deliveries:'משלוחים',crm:'לקוחות',prod:'מוצרים',sup:'ספקים',emp:'עובדים',tasks:'משימות',appt:'יומן פגישות',rep:'דוחות',settings:'הגדרות'};
 const ICO={cart:'<path d="M2.5 3h2l2.2 11.2a2 2 0 0 0 2 1.9h7.6a2 2 0 0 0 2-1.6L21 7H6"/><circle cx="9" cy="20" r="1.3"/><circle cx="17" cy="20" r="1.3"/>',truck:'<path d="M2 6h11v9H2z"/><path d="M13 10h4l3 3v2h-7z"/><circle cx="6.5" cy="18" r="1.5"/><circle cx="17" cy="18" r="1.5"/>',users:'<circle cx="9" cy="8" r="3"/><path d="M3.2 20c0-3.3 2.6-6 5.8-6s5.8 2.7 5.8 6"/><circle cx="17" cy="9" r="2.3"/><path d="M15.6 14.3c2.5.4 4.4 2.6 4.4 5.2"/>',box:'<path d="M3 8l9-5 9 5-9 5-9-5z"/><path d="M3 8v9l9 5 9-5V8"/><path d="M12 13v9"/>',building:'<rect x="4" y="3" width="16" height="18" rx="1"/><path d="M8 7h2M14 7h2M8 11h2M14 11h2M8 15h2M14 15h2"/>',badge:'<circle cx="12" cy="8" r="4"/><path d="M4.5 21c0-4.1 3.4-7.5 7.5-7.5s7.5 3.4 7.5 7.5"/>',checklist:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h10M7 13h10M7 17h6"/>',chart:'<path d="M4 20V11M10 20V4M16 20v-6M2 20h20"/>',gear:'<circle cx="12" cy="12" r="3"/><path d="M12 3v2.6M12 18.4V21M21 12h-2.6M5.6 12H3M18.4 5.6l-1.8 1.8M7.4 16.6l-1.8 1.8M18.4 18.4l-1.8-1.8M7.4 7.4 5.6 5.6"/>',tag:'<path d="M3 3h8l10 10-8 8L3 11z"/><circle cx="8" cy="8" r="1.6"/>',heart:'<path d="M12 20.3s-7.8-4.8-7.8-10.4A4.7 4.7 0 0 1 12 6.4a4.7 4.7 0 0 1 7.8 3.5c0 5.6-7.8 10.4-7.8 10.4z"/>',star:'<path d="M12 2.5l2.9 6 6.6.7-4.9 4.5 1.3 6.5L12 17l-5.9 3.2 1.3-6.5-4.9-4.5 6.6-.7z"/>',layers:'<path d="M12 3 3 8l9 5 9-5z"/><path d="M3 13l9 5 9-5"/>',shield:'<path d="M12 3l7 3v5c0 5-3.2 8.5-7 10-3.8-1.5-7-5-7-10V6z"/>',gift:'<rect x="3" y="9" width="18" height="11" rx="1"/><path d="M3 9h18v4H3z"/><path d="M12 9v11"/><path d="M12 9c-2-4-6-4-6-1s3 1 6 1zM12 9c2-4 6-4 6-1s-3 1-6 1z"/>',drop:'<path d="M12 3s6 7 6 11a6 6 0 1 1-12 0c0-4 6-11 6-11z"/>',home:'<path d="M3 11l9-7 9 7"/><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"/>',folder:'<path d="M3 7a1 1 0 0 1 1-1h5l2 2h9a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/>',cal:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><circle cx="8" cy="14.5" r="1.1"/><circle cx="12" cy="14.5" r="1.1"/><circle cx="16" cy="14.5" r="1.1"/>',drawer:'<rect x="3" y="10" width="18" height="9" rx="1"/><path d="M3 10l1.5-5.5A2 2 0 0 1 6.4 3h11.2a2 2 0 0 1 1.9 1.5L21 10"/><rect x="9" y="12" width="6" height="3" rx="0.5"/>',cartsnow:'<path d="M2.5 3h2l2.2 11.2a2 2 0 0 0 2 1.9h7.6a2 2 0 0 0 2-1.6L21 7H6"/><circle cx="9" cy="20" r="1.3"/><circle cx="17" cy="20" r="1.3"/><path d="M18 2.5v4M16.3 3.7l3.4 1.6M19.7 3.7l-3.4 1.6" stroke-width="1.4"/>',cartundo:'<path d="M2.5 3h2l2.2 11.2a2 2 0 0 0 2 1.9h7.6a2 2 0 0 0 2-1.6L21 7H6"/><circle cx="9" cy="20" r="1.3"/><circle cx="17" cy="20" r="1.3"/><path d="M19.3 8.3a3 3 0 1 1-2.8-2" stroke-width="1.6"/><path d="M15.7 4l.8 2.3 2.3-.6" stroke-width="1.6"/>',trash:'<path d="M4 7h16"/><path d="M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13"/><path d="M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"/><path d="M10 11v6M14 11v6"/>',monrcpt:'<rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16v4"/><rect x="9" y="7" width="6" height="6" rx="0.5"/><path d="M10.5 9h3M10.5 11h3"/>',clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>'};
 const svgIco=(k,s)=>`<svg viewBox="0 0 24 24" width="${s||20}" height="${s||20}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICO[k]||''}</svg>`;
@@ -4612,6 +4614,7 @@ function pl() {
 const casualId = () => (S.customers.find((c) => c.casual) || {}).id;
 // שיוך לקוח נבחר לעגלת הקופה: אם קיימת עגלה פעילה של לקוח אחר – מקפיא אותה אוטומטית לפני ההחלפה.
 function custToPos(id) {
+  if (!canTab('pos')) return toast('אין הרשאה לגשת לקופה');
   $('#dlg').className = '';
   dlgFrom = 0;
   if (cart.length && (!cust || cust.id != id)) {
@@ -6458,7 +6461,7 @@ R.crm = () => {
     all = L.length > 0 && L.every((c) => selC.has(c.id)),
     cols = ['מס׳ לקוח', 'שם', 'טלפון', 'עיר', 'מחירון', 'סטטוס', 'יתרה / אובליגו'];
   $('#res').innerHTML =
-    `<div class=row><button onclick=selAllC()>בחר הכל (${A.length})</button>${selC.size ? `<b>נבחרו ${selC.size}</b><button onclick=bulkEditCust()>עדכון נבחרים</button><button onclick="selC.clear();R.crm()">נקה בחירה</button>` : ''}</div><p class=mu>${A.length} לקוחות${A.length > 300 ? ' – מוצגים 300 הראשונים, צמצם בחיפוש' : ''} · לחיצה על שורה פותחת את האזור האישי · לחיצה על כותרת עמודה ממיינת</p><div class=sc><table><thead><tr><th><input type=checkbox ${all ? 'checked' : ''} onchange="this.checked?selAllC():(selC.clear(),R.crm())" title="בחר הכל"></th>${O(cols, (c, i) => crmHdr(c, i))}<th></th></tr></thead><tbody>${L.length ? O(L, (c) => `<tr><td><input type=checkbox ${selC.has(c.id) ? 'checked' : ''} onchange="selOneC(${c.id},this.checked)"></td><td>${esc(c.num)}</td><td>${esc(c.name)}</td><td>${esc(c.phone)}</td><td>${esc(((c.addrs || [])[0] || {}).city || '')}</td><td>${esc(c.group)}</td><td>${c.status || 'פעיל'}</td><td>${money(c.bal) + ' / ' + money(c.obligo)}</td><td><button onclick="event.stopPropagation();custToPos(${c.id})" title="מעבר לקופה עם לקוח זה">🧾</button></td></tr>`) : `<tr><td colspan=9 class=mu>אין נתונים</td></tr>`}</tbody></table></div>`;
+    `<div class=row><button onclick=selAllC()>בחר הכל (${A.length})</button>${selC.size ? `<b>נבחרו ${selC.size}</b><button onclick=bulkEditCust()>עדכון נבחרים</button><button onclick="selC.clear();R.crm()">נקה בחירה</button>` : ''}</div><p class=mu>${A.length} לקוחות${A.length > 300 ? ' – מוצגים 300 הראשונים, צמצם בחיפוש' : ''} · לחיצה על שורה פותחת את האזור האישי · לחיצה על כותרת עמודה ממיינת</p><div class=sc><table><thead><tr><th><input type=checkbox ${all ? 'checked' : ''} onchange="this.checked?selAllC():(selC.clear(),R.crm())" title="בחר הכל"></th>${O(cols, (c, i) => crmHdr(c, i))}<th></th></tr></thead><tbody>${L.length ? O(L, (c) => `<tr><td><input type=checkbox ${selC.has(c.id) ? 'checked' : ''} onchange="selOneC(${c.id},this.checked)"></td><td>${esc(c.num)}</td><td>${esc(c.name)}</td><td>${esc(c.phone)}</td><td>${esc(((c.addrs || [])[0] || {}).city || '')}</td><td>${esc(c.group)}</td><td>${c.status || 'פעיל'}</td><td>${money(c.bal) + ' / ' + money(c.obligo)}</td><td>${canTab('pos') ? `<button onclick="event.stopPropagation();custToPos(${c.id})" title="מעבר לקופה עם לקוח זה">🧾</button>` : ''}</td></tr>`) : `<tr><td colspan=9 class=mu>אין נתונים</td></tr>`}</tbody></table></div>`;
   [...document.querySelectorAll('#res tbody tr')].forEach((tr, i) => {
     if (!L[i]) return;
     tr.style.cursor = 'pointer';
@@ -6766,7 +6769,7 @@ function ccard(id, t) {
   const c = C(id);
   dlgFrom = id;
   modal(
-    `<div class=cc><nav class=cn><button onclick=close_()>← חזרה לתוצאות</button><button class=pri onclick="custToPos(${id})">🛒 לקופה עם לקוח זה</button><div class=chd><b>${esc(c.name)}</b><br><small class=mu>#${esc(c.num)}${c.phone ? ' · ' + esc(c.phone) : ''}</small>${c.bal > 0 ? `<div class=er>חוב ${money(c.bal)}</div>` : ''}</div>${O(Object.entries(CTABS), ([k, v]) => `<button class="${k == ctab ? 'pri' : ''}" onclick="ccard(${id},'${k}')">${v}${k == 'tk' ? ' (' + S.tasks.filter((x) => x.cust == id && x.st != 'בוצע').length + ')' : ''}</button>`)}</nav><section class=cb>${CT[ctab](c)}</section></div>`,
+    `<div class=cc><nav class=cn><button onclick=close_()>← חזרה לתוצאות</button>${canTab('pos') ? `<button class=pri onclick="custToPos(${id})">🛒 לקופה עם לקוח זה</button>` : ''}<div class=chd><b>${esc(c.name)}</b><br><small class=mu>#${esc(c.num)}${c.phone ? ' · ' + esc(c.phone) : ''}</small>${c.bal > 0 ? `<div class=er>חוב ${money(c.bal)}</div>` : ''}</div>${O(Object.entries(CTABS), ([k, v]) => `<button class="${k == ctab ? 'pri' : ''}" onclick="ccard(${id},'${k}')">${v}${k == 'tk' ? ' (' + S.tasks.filter((x) => x.cust == id && x.st != 'בוצע').length + ')' : ''}</button>`)}</nav><section class=cb>${CT[ctab](c)}</section></div>`,
     'full',
   );
 }
@@ -6799,7 +6802,7 @@ CT.ov = (c) => {
     bx(
       'תנועה אחרונה',
       ls
-        ? `${dt(ls.ts)}<br>${money(ls.total)} · ${sm(ls.lines, (l) => l.qty)} פריטים<div class=row style="margin:6px 0 0"><button onclick="showR(${ls.id},${c.id})">הדפסה</button><button onclick="dupCrm(${ls.id},${c.id})">שכפל הזמנה</button></div>`
+        ? `${dt(ls.ts)}<br>${money(ls.total)} · ${sm(ls.lines, (l) => l.qty)} פריטים<div class=row style="margin:6px 0 0"><button onclick="showR(${ls.id},${c.id})">הדפסה</button>${canTab('pos') ? `<button onclick="dupCrm(${ls.id},${c.id})">שכפל הזמנה</button>` : ''}</div>`
         : '<span class=mu>אין תנועות</span>',
     ) +
     bx(
@@ -6946,7 +6949,7 @@ CT.tx = (c) => {
     `<div class=sc><table><thead><tr><th></th><th>#</th><th>תאריך ושעה</th><th>פריטים</th><th>סה״כ</th><th>שולם</th><th>על חשבון</th><th>משלוח</th><th></th></tr></thead><tbody>${
       O(h, (x) => {
         const o = txo.has(x.id);
-        return `<tr class=ledr onclick="txTog(${c.id},${x.id})"><td><button onclick="event.stopPropagation();txTog(${c.id},${x.id})" title="פתיחה / סגירה של התנועה">${o ? '▾' : '▸'}</button></td><td>${x.id}</td><td>${dt(x.ts)}</td><td>${sm(x.lines, (l) => l.qty)}</td><td>${money(x.total)}</td><td>${money(paidOf(x))}</td><td>${accOf(x) ? money(accOf(x)) : ''}</td><td onclick="event.stopPropagation()">${x.dl ? `<small>${esc(x.dl.addr)}</small> <select onchange="dst(${x.id},this.value)">${opts(['בהכנה', 'מוכן', 'בדרך', 'נמסר'], x.dl.st)}</select>` : `<button onclick="event.stopPropagation();txDlForm(${x.id})">+ הוסף משלוח</button>`}</td><td onclick="event.stopPropagation()"><button onclick="showR(${x.id},${c.id},1)" title="הדפסת העתק של התנועה, עם סימון ״העתק״">🖨 העתק</button><button onclick="dupCrm(${x.id},${c.id})">שכפל הזמנה</button></td></tr>${o ? `<tr><td colspan=9>${txDet(x)}</td></tr>` : ''}`;
+        return `<tr class=ledr onclick="txTog(${c.id},${x.id})"><td><button onclick="event.stopPropagation();txTog(${c.id},${x.id})" title="פתיחה / סגירה של התנועה">${o ? '▾' : '▸'}</button></td><td>${x.id}</td><td>${dt(x.ts)}</td><td>${sm(x.lines, (l) => l.qty)}</td><td>${money(x.total)}</td><td>${money(paidOf(x))}</td><td>${accOf(x) ? money(accOf(x)) : ''}</td><td onclick="event.stopPropagation()">${x.dl ? `<small>${esc(x.dl.addr)}</small> <select onchange="dst(${x.id},this.value)">${opts(['בהכנה', 'מוכן', 'בדרך', 'נמסר'], x.dl.st)}</select>` : `<button onclick="event.stopPropagation();txDlForm(${x.id})">+ הוסף משלוח</button>`}</td><td onclick="event.stopPropagation()"><button onclick="showR(${x.id},${c.id},1)" title="הדפסת העתק של התנועה, עם סימון ״העתק״">🖨 העתק</button>${canTab('pos') ? `<button onclick="dupCrm(${x.id},${c.id})">שכפל הזמנה</button>` : ''}</td></tr>${o ? `<tr><td colspan=9>${txDet(x)}</td></tr>` : ''}`;
       }) || '<tr><td colspan=9 class=mu>אין תנועות</td></tr>'
     }</tbody></table></div>`
   );
@@ -7235,6 +7238,7 @@ CT.pet = (c) => {
 };
 // שכפול עסקה קיימת לעגלת קופה חדשה עבור אותו לקוח (מעביר לקופה עם הפריטים טעונים מראש).
 function dupCrm(sid, cid) {
+  if (!canTab('pos')) return toast('אין הרשאה לגשת לקופה');
   if (cart.length) return toast('העגלה בקופה אינה ריקה – הקפא או נקה קודם');
   const x = S.sales.find((y) => y.id == sid);
   cart = x.lines.filter((l) => P(l.pid)).map((l) => ({ pid: l.pid, qty: l.qty }));
@@ -13894,6 +13898,7 @@ function trackRep(nm) {
 }
 // goRep: ניווט ישיר למסך הדוחות עם דוח ספציפי פתוח (למשל מקישור בכרטיס לקוח/מוצר), עם סינון נקי.
 function goRep(cat, nm) {
+  if (!canTab('rep')) return toast('אין הרשאה לדוחות');
   snapF();
   tab = 'rep';
   rtop = cat;
