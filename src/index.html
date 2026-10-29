@@ -5,9 +5,9 @@
 <title>קופה · לקוחות · ניהול</title>
 <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#EDEEE4;--pn:#F8F7F0;--ink:#1B1F1C;--mu:#6B6657;--ln:#D7D3C4;--ac:#9C4225;--on:#F8F3E8;--wr:#A8710C;--er:#7A2318;--hi:#E4DCC7;--brass:#C79A3E;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17160F;--pn:#201E16;--ink:#EDE9DC;--mu:#A6A08D;--ln:#3C372A;--ac:#D9794A;--on:#241206;--wr:#E0A94C;--er:#E2765F;--hi:#2B2820;--brass:#D9B35C}}
-:root[data-theme="dark"]{--bg:#17160F;--pn:#201E16;--ink:#EDE9DC;--mu:#A6A08D;--ln:#3C372A;--ac:#D9794A;--on:#241206;--wr:#E0A94C;--er:#E2765F;--hi:#2B2820;--brass:#D9B35C}
+:root{--bg:#EDEEE4;--pn:#F8F7F0;--ink:#1B1F1C;--mu:#6B6657;--ln:#D7D3C4;--ac:#9C4225;--on:#F8F3E8;--wr:#A8710C;--er:#7A2318;--ok:#3F7D4A;--hi:#E4DCC7;--brass:#C79A3E;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17160F;--pn:#201E16;--ink:#EDE9DC;--mu:#A6A08D;--ln:#3C372A;--ac:#D9794A;--on:#241206;--wr:#E0A94C;--er:#E2765F;--ok:#6FAE78;--hi:#2B2820;--brass:#D9B35C}}
+:root[data-theme="dark"]{--bg:#17160F;--pn:#201E16;--ink:#EDE9DC;--mu:#A6A08D;--ln:#3C372A;--ac:#D9794A;--on:#241206;--wr:#E0A94C;--er:#E2765F;--ok:#6FAE78;--hi:#2B2820;--brass:#D9B35C}
 html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
 *{box-sizing:border-box}
 body{margin:0;display:flex;flex-direction:column;height:100%;height:100dvh;background:var(--bg);color:var(--ink);font:15px/1.45 Assistant,Heebo,Arial,sans-serif}
@@ -112,6 +112,7 @@ td button{padding:2px 8px;margin:1px}
 .pr{color:var(--wr);font-size:13px}.tot{font-size:26px;font-weight:800;font-family:Assistant,Arial,sans-serif;color:var(--ac)}
 .sum{display:flex;justify-content:space-between;padding:6px 8px;background:var(--hi);border-radius:6px;margin:8px 0}
 .er{color:var(--er)}
+.ok{color:var(--ok)}
 .bar{display:block;height:10px;background:var(--ac);border-radius:3px}
 .rbc-wrap{display:flex;gap:6px;padding:14px 4px 4px}
 .rbc-axis{height:160px;display:flex;flex-direction:column;justify-content:space-between;font-size:11px;color:var(--mu);text-align:end;font-variant-numeric:tabular-nums;flex:0 0 auto}
@@ -3242,7 +3243,9 @@ const tbl=(c,r)=>`<div class=sc><table><thead><tr>${O(c,x=>`<th>${x}</th>`)}</tr
 let sFrom=0,sxo=new Set(),cbAfter=null,dlgFrom=0,pcats=[],psups=[],tLog=[],txDlSaid=0,cshow=new Set(),cshowId=0,adx=new Set(),rk=new Set(),tkAll=false,tkDone=false,txv='list',txo=new Set(),dlx=null,pv=false,ctab='ov',kp='',mul=0,view=null,buildMode=false,dragI=null,sel=new Set(),S,tab='pos',cart=[],cust=null,note='',gd=null,promoOn=true,tl=-1,lfOpen=-1,emp=0,br=0,cur={tot:0},lastRep={cols:[],rows:[]},lastTrackedRep=null,dashView='num',dashRange='d';
 const P=id=>S.products.find(p=>p.id==id),C=id=>S.customers.find(c=>c.id==id),Sp=id=>S.suppliers.find(s=>s.id==id);
 const nid=k=>(S.seq[k]=(S.seq[k]||0)+1),stk=p=>sm(p.stock,x=>x||0),save=()=>{try{localStorage.setItem(K,JSON.stringify(S))}catch(e){toast('השמירה נכשלה – אחסון הדפדפן מלא')}scheduleCloudSync()};
-let cloudSyncTimer=null,cloudPulling=false;const CLOUD_TABLES=[['products','products',['img']],['suppliers','suppliers',[]],['customers','customers',[]],['sales','sales',[]]];
+let cloudSyncTimer=null,cloudPulling=false;
+// img כבר לא דגול מ-CLOUD_TABLES: מאז שתמונות עוברות דרך Storage (product-images bucket) ולא כ-base64 מוטבע, p.img הוא רק כתובת URL קצרה - זול וסביר לסנכרן כמו כל שדה אחר.
+const CLOUD_TABLES=[['products','products',[]],['suppliers','suppliers',[]],['customers','customers',[]],['sales','sales',[]]];
 const SB_URL='https://iwyuhmkaprohsrkbrxxd.supabase.co';
 const SB_KEY='sb_publishable_PeaA7r8-MlO4Ii1-gBO_mA_kgSow2h5';
 const STORE_ID='3394b5fa-3e17-45ce-997e-ab03ea0c62ba';
@@ -3287,6 +3290,8 @@ const petNames=c=>((c&&c.pets)||[]).map(p=>p.name).join(', ');
 const intl=p=>{p=(p||'').replace(/\D/g,'');return p[0]=='0'?'972'+p.slice(1):p};
 const PRI=['','נמוכה','רגילה','בינונית','גבוהה','דחופה'],PC=['','#8a97a3','#2980b9','#e8a35a','#e67e22','#c0392b'],priBar=n=>{n=n||2;return`<span class=pbar title="${PRI[n]}"><i style="width:${n*20}%;background:${PC[n]}"></i></span> <small>${PRI[n]}</small>`};
 const cfg=()=>S.cfg,can=k=>{const r=S.roles[S.emps[emp].role];return r.tabs=='all'||r.perm=='all'||(Array.isArray(r.perm)&&r.perm.includes(k))};
+// canTab: בדיקה אם לתפקיד הנוכחי יש גישה לטאב מסוים - אותה בדיקה המשמשת לסינון תפריט הניווט, אך נגישה גם מפעולות שמנסות לקפוץ ישירות לטאב (כמו custToPos/dupCrm), כדי שקישור מטאב אחד לא יעקוף את הרשאות הטאבים.
+const canTab=k=>{const r=S.roles[S.emps[emp].role];return r.tabs=='all'||r.tabs.includes(k)};
 const TABS={dash:'לוח בקרה',pos:'קופה',deliveries:'משלוחים',crm:'לקוחות',prod:'מוצרים',sup:'ספקים',emp:'עובדים',tasks:'משימות',appt:'יומן פגישות',rep:'דוחות',settings:'הגדרות'};
 const ICO={cart:'<path d="M2.5 3h2l2.2 11.2a2 2 0 0 0 2 1.9h7.6a2 2 0 0 0 2-1.6L21 7H6"/><circle cx="9" cy="20" r="1.3"/><circle cx="17" cy="20" r="1.3"/>',truck:'<path d="M2 6h11v9H2z"/><path d="M13 10h4l3 3v2h-7z"/><circle cx="6.5" cy="18" r="1.5"/><circle cx="17" cy="18" r="1.5"/>',users:'<circle cx="9" cy="8" r="3"/><path d="M3.2 20c0-3.3 2.6-6 5.8-6s5.8 2.7 5.8 6"/><circle cx="17" cy="9" r="2.3"/><path d="M15.6 14.3c2.5.4 4.4 2.6 4.4 5.2"/>',box:'<path d="M3 8l9-5 9 5-9 5-9-5z"/><path d="M3 8v9l9 5 9-5V8"/><path d="M12 13v9"/>',building:'<rect x="4" y="3" width="16" height="18" rx="1"/><path d="M8 7h2M14 7h2M8 11h2M14 11h2M8 15h2M14 15h2"/>',badge:'<circle cx="12" cy="8" r="4"/><path d="M4.5 21c0-4.1 3.4-7.5 7.5-7.5s7.5 3.4 7.5 7.5"/>',checklist:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h10M7 13h10M7 17h6"/>',chart:'<path d="M4 20V11M10 20V4M16 20v-6M2 20h20"/>',gear:'<circle cx="12" cy="12" r="3"/><path d="M12 3v2.6M12 18.4V21M21 12h-2.6M5.6 12H3M18.4 5.6l-1.8 1.8M7.4 16.6l-1.8 1.8M18.4 18.4l-1.8-1.8M7.4 7.4 5.6 5.6"/>',tag:'<path d="M3 3h8l10 10-8 8L3 11z"/><circle cx="8" cy="8" r="1.6"/>',heart:'<path d="M12 20.3s-7.8-4.8-7.8-10.4A4.7 4.7 0 0 1 12 6.4a4.7 4.7 0 0 1 7.8 3.5c0 5.6-7.8 10.4-7.8 10.4z"/>',star:'<path d="M12 2.5l2.9 6 6.6.7-4.9 4.5 1.3 6.5L12 17l-5.9 3.2 1.3-6.5-4.9-4.5 6.6-.7z"/>',layers:'<path d="M12 3 3 8l9 5 9-5z"/><path d="M3 13l9 5 9-5"/>',shield:'<path d="M12 3l7 3v5c0 5-3.2 8.5-7 10-3.8-1.5-7-5-7-10V6z"/>',gift:'<rect x="3" y="9" width="18" height="11" rx="1"/><path d="M3 9h18v4H3z"/><path d="M12 9v11"/><path d="M12 9c-2-4-6-4-6-1s3 1 6 1zM12 9c2-4 6-4 6-1s-3 1-6 1z"/>',drop:'<path d="M12 3s6 7 6 11a6 6 0 1 1-12 0c0-4 6-11 6-11z"/>',home:'<path d="M3 11l9-7 9 7"/><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"/>',folder:'<path d="M3 7a1 1 0 0 1 1-1h5l2 2h9a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/>',cal:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><circle cx="8" cy="14.5" r="1.1"/><circle cx="12" cy="14.5" r="1.1"/><circle cx="16" cy="14.5" r="1.1"/>',drawer:'<rect x="3" y="10" width="18" height="9" rx="1"/><path d="M3 10l1.5-5.5A2 2 0 0 1 6.4 3h11.2a2 2 0 0 1 1.9 1.5L21 10"/><rect x="9" y="12" width="6" height="3" rx="0.5"/>',cartsnow:'<path d="M2.5 3h2l2.2 11.2a2 2 0 0 0 2 1.9h7.6a2 2 0 0 0 2-1.6L21 7H6"/><circle cx="9" cy="20" r="1.3"/><circle cx="17" cy="20" r="1.3"/><path d="M18 2.5v4M16.3 3.7l3.4 1.6M19.7 3.7l-3.4 1.6" stroke-width="1.4"/>',cartundo:'<path d="M2.5 3h2l2.2 11.2a2 2 0 0 0 2 1.9h7.6a2 2 0 0 0 2-1.6L21 7H6"/><circle cx="9" cy="20" r="1.3"/><circle cx="17" cy="20" r="1.3"/><path d="M19.3 8.3a3 3 0 1 1-2.8-2" stroke-width="1.6"/><path d="M15.7 4l.8 2.3 2.3-.6" stroke-width="1.6"/>',trash:'<path d="M4 7h16"/><path d="M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13"/><path d="M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"/><path d="M10 11v6M14 11v6"/>',monrcpt:'<rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16v4"/><rect x="9" y="7" width="6" height="6" rx="0.5"/><path d="M10.5 9h3M10.5 11h3"/>',clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>'};
 const svgIco=(k,s)=>`<svg viewBox="0 0 24 24" width="${s||20}" height="${s||20}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICO[k]||''}</svg>`;
@@ -4609,6 +4614,7 @@ function pl() {
 const casualId = () => (S.customers.find((c) => c.casual) || {}).id;
 // שיוך לקוח נבחר לעגלת הקופה: אם קיימת עגלה פעילה של לקוח אחר – מקפיא אותה אוטומטית לפני ההחלפה.
 function custToPos(id) {
+  if (!canTab('pos')) return toast('אין הרשאה לגשת לקופה');
   $('#dlg').className = '';
   dlgFrom = 0;
   if (cart.length && (!cust || cust.id != id)) {
@@ -6455,7 +6461,7 @@ R.crm = () => {
     all = L.length > 0 && L.every((c) => selC.has(c.id)),
     cols = ['מס׳ לקוח', 'שם', 'טלפון', 'עיר', 'מחירון', 'סטטוס', 'יתרה / אובליגו'];
   $('#res').innerHTML =
-    `<div class=row><button onclick=selAllC()>בחר הכל (${A.length})</button>${selC.size ? `<b>נבחרו ${selC.size}</b><button onclick=bulkEditCust()>עדכון נבחרים</button><button onclick="selC.clear();R.crm()">נקה בחירה</button>` : ''}</div><p class=mu>${A.length} לקוחות${A.length > 300 ? ' – מוצגים 300 הראשונים, צמצם בחיפוש' : ''} · לחיצה על שורה פותחת את האזור האישי · לחיצה על כותרת עמודה ממיינת</p><div class=sc><table><thead><tr><th><input type=checkbox ${all ? 'checked' : ''} onchange="this.checked?selAllC():(selC.clear(),R.crm())" title="בחר הכל"></th>${O(cols, (c, i) => crmHdr(c, i))}<th></th></tr></thead><tbody>${L.length ? O(L, (c) => `<tr><td><input type=checkbox ${selC.has(c.id) ? 'checked' : ''} onchange="selOneC(${c.id},this.checked)"></td><td>${esc(c.num)}</td><td>${esc(c.name)}</td><td>${esc(c.phone)}</td><td>${esc(((c.addrs || [])[0] || {}).city || '')}</td><td>${esc(c.group)}</td><td>${c.status || 'פעיל'}</td><td>${money(c.bal) + ' / ' + money(c.obligo)}</td><td><button onclick="event.stopPropagation();custToPos(${c.id})" title="מעבר לקופה עם לקוח זה">🧾</button></td></tr>`) : `<tr><td colspan=9 class=mu>אין נתונים</td></tr>`}</tbody></table></div>`;
+    `<div class=row><button onclick=selAllC()>בחר הכל (${A.length})</button>${selC.size ? `<b>נבחרו ${selC.size}</b><button onclick=bulkEditCust()>עדכון נבחרים</button><button onclick="selC.clear();R.crm()">נקה בחירה</button>` : ''}</div><p class=mu>${A.length} לקוחות${A.length > 300 ? ' – מוצגים 300 הראשונים, צמצם בחיפוש' : ''} · לחיצה על שורה פותחת את האזור האישי · לחיצה על כותרת עמודה ממיינת</p><div class=sc><table><thead><tr><th><input type=checkbox ${all ? 'checked' : ''} onchange="this.checked?selAllC():(selC.clear(),R.crm())" title="בחר הכל"></th>${O(cols, (c, i) => crmHdr(c, i))}<th></th></tr></thead><tbody>${L.length ? O(L, (c) => `<tr><td><input type=checkbox ${selC.has(c.id) ? 'checked' : ''} onchange="selOneC(${c.id},this.checked)"></td><td>${esc(c.num)}</td><td>${esc(c.name)}</td><td>${esc(c.phone)}</td><td>${esc(((c.addrs || [])[0] || {}).city || '')}</td><td>${esc(c.group)}</td><td>${c.status || 'פעיל'}</td><td>${money(c.bal) + ' / ' + money(c.obligo)}</td><td>${canTab('pos') ? `<button onclick="event.stopPropagation();custToPos(${c.id})" title="מעבר לקופה עם לקוח זה">🧾</button>` : ''}</td></tr>`) : `<tr><td colspan=9 class=mu>אין נתונים</td></tr>`}</tbody></table></div>`;
   [...document.querySelectorAll('#res tbody tr')].forEach((tr, i) => {
     if (!L[i]) return;
     tr.style.cursor = 'pointer';
@@ -6763,7 +6769,7 @@ function ccard(id, t) {
   const c = C(id);
   dlgFrom = id;
   modal(
-    `<div class=cc><nav class=cn><button onclick=close_()>← חזרה לתוצאות</button><button class=pri onclick="custToPos(${id})">🛒 לקופה עם לקוח זה</button><div class=chd><b>${esc(c.name)}</b><br><small class=mu>#${esc(c.num)}${c.phone ? ' · ' + esc(c.phone) : ''}</small>${c.bal > 0 ? `<div class=er>חוב ${money(c.bal)}</div>` : ''}</div>${O(Object.entries(CTABS), ([k, v]) => `<button class="${k == ctab ? 'pri' : ''}" onclick="ccard(${id},'${k}')">${v}${k == 'tk' ? ' (' + S.tasks.filter((x) => x.cust == id && x.st != 'בוצע').length + ')' : ''}</button>`)}</nav><section class=cb>${CT[ctab](c)}</section></div>`,
+    `<div class=cc><nav class=cn><button onclick=close_()>← חזרה לתוצאות</button>${canTab('pos') ? `<button class=pri onclick="custToPos(${id})">🛒 לקופה עם לקוח זה</button>` : ''}<div class=chd><b>${esc(c.name)}</b><br><small class=mu>#${esc(c.num)}${c.phone ? ' · ' + esc(c.phone) : ''}</small>${c.bal > 0 ? `<div class=er>חוב ${money(c.bal)}</div>` : ''}</div>${O(Object.entries(CTABS), ([k, v]) => `<button class="${k == ctab ? 'pri' : ''}" onclick="ccard(${id},'${k}')">${v}${k == 'tk' ? ' (' + S.tasks.filter((x) => x.cust == id && x.st != 'בוצע').length + ')' : ''}</button>`)}</nav><section class=cb>${CT[ctab](c)}</section></div>`,
     'full',
   );
 }
@@ -6796,7 +6802,7 @@ CT.ov = (c) => {
     bx(
       'תנועה אחרונה',
       ls
-        ? `${dt(ls.ts)}<br>${money(ls.total)} · ${sm(ls.lines, (l) => l.qty)} פריטים<div class=row style="margin:6px 0 0"><button onclick="showR(${ls.id},${c.id})">הדפסה</button><button onclick="dupCrm(${ls.id},${c.id})">שכפל הזמנה</button></div>`
+        ? `${dt(ls.ts)}<br>${money(ls.total)} · ${sm(ls.lines, (l) => l.qty)} פריטים<div class=row style="margin:6px 0 0"><button onclick="showR(${ls.id},${c.id})">הדפסה</button>${canTab('pos') ? `<button onclick="dupCrm(${ls.id},${c.id})">שכפל הזמנה</button>` : ''}</div>`
         : '<span class=mu>אין תנועות</span>',
     ) +
     bx(
@@ -6943,7 +6949,7 @@ CT.tx = (c) => {
     `<div class=sc><table><thead><tr><th></th><th>#</th><th>תאריך ושעה</th><th>פריטים</th><th>סה״כ</th><th>שולם</th><th>על חשבון</th><th>משלוח</th><th></th></tr></thead><tbody>${
       O(h, (x) => {
         const o = txo.has(x.id);
-        return `<tr class=ledr onclick="txTog(${c.id},${x.id})"><td><button onclick="event.stopPropagation();txTog(${c.id},${x.id})" title="פתיחה / סגירה של התנועה">${o ? '▾' : '▸'}</button></td><td>${x.id}</td><td>${dt(x.ts)}</td><td>${sm(x.lines, (l) => l.qty)}</td><td>${money(x.total)}</td><td>${money(paidOf(x))}</td><td>${accOf(x) ? money(accOf(x)) : ''}</td><td onclick="event.stopPropagation()">${x.dl ? `<small>${esc(x.dl.addr)}</small> <select onchange="dst(${x.id},this.value)">${opts(['בהכנה', 'מוכן', 'בדרך', 'נמסר'], x.dl.st)}</select>` : `<button onclick="event.stopPropagation();txDlForm(${x.id})">+ הוסף משלוח</button>`}</td><td onclick="event.stopPropagation()"><button onclick="showR(${x.id},${c.id},1)" title="הדפסת העתק של התנועה, עם סימון ״העתק״">🖨 העתק</button><button onclick="dupCrm(${x.id},${c.id})">שכפל הזמנה</button></td></tr>${o ? `<tr><td colspan=9>${txDet(x)}</td></tr>` : ''}`;
+        return `<tr class=ledr onclick="txTog(${c.id},${x.id})"><td><button onclick="event.stopPropagation();txTog(${c.id},${x.id})" title="פתיחה / סגירה של התנועה">${o ? '▾' : '▸'}</button></td><td>${x.id}</td><td>${dt(x.ts)}</td><td>${sm(x.lines, (l) => l.qty)}</td><td>${money(x.total)}</td><td>${money(paidOf(x))}</td><td>${accOf(x) ? money(accOf(x)) : ''}</td><td onclick="event.stopPropagation()">${x.dl ? `<small>${esc(x.dl.addr)}</small> <select onchange="dst(${x.id},this.value)">${opts(['בהכנה', 'מוכן', 'בדרך', 'נמסר'], x.dl.st)}</select>` : `<button onclick="event.stopPropagation();txDlForm(${x.id})">+ הוסף משלוח</button>`}</td><td onclick="event.stopPropagation()"><button onclick="showR(${x.id},${c.id},1)" title="הדפסת העתק של התנועה, עם סימון ״העתק״">🖨 העתק</button>${canTab('pos') ? `<button onclick="dupCrm(${x.id},${c.id})">שכפל הזמנה</button>` : ''}</td></tr>${o ? `<tr><td colspan=9>${txDet(x)}</td></tr>` : ''}`;
       }) || '<tr><td colspan=9 class=mu>אין תנועות</td></tr>'
     }</tbody></table></div>`
   );
@@ -7232,6 +7238,7 @@ CT.pet = (c) => {
 };
 // שכפול עסקה קיימת לעגלת קופה חדשה עבור אותו לקוח (מעביר לקופה עם הפריטים טעונים מראש).
 function dupCrm(sid, cid) {
+  if (!canTab('pos')) return toast('אין הרשאה לגשת לקופה');
   if (cart.length) return toast('העגלה בקופה אינה ריקה – הקפא או נקה קודם');
   const x = S.sales.find((y) => y.id == sid);
   cart = x.lines.filter((l) => P(l.pid)).map((l) => ({ pid: l.pid, qty: l.qty }));
@@ -7705,6 +7712,65 @@ const histSave = () =>
   idb('readwrite', (s) => s.put(HIST, 'hist')).catch(() =>
     toast('לא ניתן לשמור את היסטוריית התנועות בדפדפן'),
   );
+// histCloudPush: דחיפת היסטוריית התנועות של לקוחות נבחרים (nums) לטבלת legacy_history בענן, כדי שתהיה נגישה מכל עמדה. שמות המוצרים נשלחים מפורשים (ולא כאינדקס למילון HIST.n המקומי), כי אינדקס המילון הוא פרטי לכל עמדה ולא ניתן לסנכרון ישיר.
+async function histCloudPush(nums) {
+  if (!sb || !myStore || !nums || !nums.length) return;
+  const rows = nums
+    .filter((num) => HIST.d[num] && HIST.d[num].length)
+    .map((num) => ({
+      store_id: myStore.store_id,
+      client_id: String(num),
+      data: {
+        docs: HIST.d[num].map((d) => ({
+          ...d,
+          l: d.l.map((x) => [HIST.n[x[0]], x[1], x[2], x[3]]),
+        })),
+      },
+    }));
+  for (let i = 0; i < rows.length; i += 300) {
+    const chunk = rows.slice(i, i + 300);
+    const { error } = await sb.from('legacy_history').upsert(chunk, { onConflict: 'store_id,client_id' });
+    if (error) {
+      console.error('legacy history push error', error);
+      return;
+    }
+  }
+}
+// histCloudPull: שליפת כל היסטוריית התנועות מהענן (מכל העמדות) ומיזוגה לתוך HIST המקומי - ממיר שמות מוצרים חזרה לאינדקסים במילון המקומי HIST.n, ומונע כפילויות לפי מפתח סוג+מספר מסמך (כמו בייבוא רגיל).
+async function histCloudPull() {
+  if (!sb || !myStore) return;
+  const rows = await pullAll('legacy_history');
+  if (!rows) return;
+  const hm = new Map(HIST.n.map((x, i) => [x, i])),
+    ni = (n) => {
+      let i = hm.get(n);
+      if (i == null) {
+        i = HIST.n.length;
+        HIST.n.push(n);
+        hm.set(n, i);
+      }
+      return i;
+    };
+  let changed = false;
+  for (const row of rows) {
+    const num = row.client_id,
+      docs = (row.data && row.data.docs) || [];
+    if (!docs.length) continue;
+    const nw = docs.map((d) => ({ ...d, l: d.l.map((x) => [ni(x[0]), x[1], x[2], x[3]]) })),
+      keys = new Set(nw.map((d) => d.k + '|' + d.n)),
+      existing = HIST.d[num] || [],
+      existingKeys = new Set(existing.map((d) => d.k + '|' + d.n)),
+      toAdd = nw.filter((d) => !existingKeys.has(d.k + '|' + d.n));
+    if (toAdd.length) {
+      HIST.d[num] = [...existing, ...toAdd].sort((a, b) => a.t - b.t);
+      changed = true;
+    }
+  }
+  if (changed) {
+    await histSave();
+    render();
+  }
+}
 // שמירת מאגר תמונות המוצרים (IMG) ל-IndexedDB.
 const imgSave = () =>
   idb('readwrite', (s) => s.put(IMG, 'imgs')).catch(() => toast('לא ניתן לשמור תמונות בדפדפן'));
@@ -7946,6 +8012,7 @@ function txApply() {
   impT = null;
   save();
   histSave();
+  histCloudPush(Object.keys(r.docs));
   close_();
   render();
   toast(`יובאו ${nd} מסמכים · נוצרו ${made} כרטיסי לקוח חדשים`);
@@ -7993,7 +8060,13 @@ const oldBox = (c) => {
   const l = hd[hd.length - 1];
   return `${hd.length} מסמכים · אחרון: ${D(l.t)}<br>${esc(DTN[l.k] || l.k)} ${esc(l.n)} · ${money(l.d)}<div class=row style="margin:6px 0 0"><button onclick="txView(${c.id},'old')">פתח היסטוריה</button></div>`;
 };
-// טעינת תמונת מוצר שנבחרה, הקטנתה (עד 260 פיקסל) ושמירתה כתמונה ממתינה לפני שיוך למוצר.
+// pendImgUploading: true בזמן שהעלאת תמונת המוצר ל-Storage בענן עדיין רצה - חוסם שמירת הטופס כדי לא לאבד את ההעלאה.
+let pendImgUploading = false;
+const setImgStatus = (t) => {
+  const e = $('#imgStatus');
+  if (e) e.textContent = t || '';
+};
+// טעינת תמונת מוצר שנבחרה, הקטנתה (עד 640 פיקסל) והעלאתה ל-Storage בענן (bucket ציבורי product-images, תחת תיקיית החנות) כדי שתופיע בכל העמדות; pendImg מחזיק בינתיים תצוגה מקדימה מקומית ולבסוף את כתובת ה-URL שהועלתה. בלי חיבור לענן (או אם ההעלאה נכשלת) נשמרת רק התצוגה המקומית, כמו קודם.
 function imgPick(inp) {
   const f = inp.files[0];
   if (!f) return;
@@ -8001,13 +8074,47 @@ function imgPick(inp) {
   r.onload = () => {
     const im = new Image();
     im.onload = () => {
-      const k = Math.min(1, 260 / Math.max(im.width, im.height)),
+      const k = Math.min(1, 640 / Math.max(im.width, im.height)),
         c = document.createElement('canvas');
       c.width = Math.round(im.width * k);
       c.height = Math.round(im.height * k);
       c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
-      pendImg = c.toDataURL('image/jpeg', 0.78);
+      pendImg = c.toDataURL('image/jpeg', 0.8);
       $('#pimg').src = pendImg;
+      if (sb && myStore) {
+        pendImgUploading = true;
+        setImgStatus('מעלה תמונה…');
+        c.toBlob(
+          (blob) => {
+            if (!blob) {
+              pendImgUploading = false;
+              setImgStatus('');
+              return;
+            }
+            const path =
+              myStore.store_id + '/' + Date.now() + '_' + Math.random().toString(36).slice(2) + '.jpg';
+            sb.storage
+              .from('product-images')
+              .upload(path, blob, { contentType: 'image/jpeg', upsert: true })
+              .then(({ error }) => {
+                if (error) throw error;
+                const {
+                  data: { publicUrl },
+                } = sb.storage.from('product-images').getPublicUrl(path);
+                pendImg = publicUrl;
+                setImgStatus('✓ הועלה לענן - יוצג בכל העמדות');
+              })
+              .catch(() => {
+                setImgStatus('⚠ ההעלאה לענן נכשלה - התמונה תישמר במכשיר זה בלבד');
+              })
+              .finally(() => {
+                pendImgUploading = false;
+              });
+          },
+          'image/jpeg',
+          0.8,
+        );
+      }
     };
     im.onerror = () => toast('לא ניתן לקרוא את התמונה');
     im.src = r.result;
@@ -8016,6 +8123,8 @@ function imgPick(inp) {
 }
 // ביטול תמונת המוצר הממתינה שנבחרה.
 const imgClr = () => {
+  pendImgUploading = false;
+  setImgStatus('');
   pendImg = null;
   $('#pimg').src = '';
 };
@@ -8744,7 +8853,7 @@ function prodForm(id, pre) {
       'בחר ספק קיים…',
       'או הקלד ספק חדש',
     );
-  const imgH = `<div class=row><img id=pimg class=pi style="width:110px;height:110px" src="${esc(imgSrc(IMG[p.id] || p.img || ''))}" alt=""><label class=ck>תמונת מוצר <input type=file accept="image/*" onchange="imgPick(this)"></label><button type=button onclick=imgClr()>הסר תמונה</button></div>`;
+  const imgH = `<div class=row><img id=pimg class=pi style="width:110px;height:110px" src="${esc(imgSrc(IMG[p.id] || p.img || ''))}" alt=""><label class=ck>תמונת מוצר <input type=file accept="image/*" onchange="imgPick(this)"></label><button type=button onclick=imgClr()>הסר תמונה</button><small id=imgStatus class=mu></small></div>`;
   const eff = (g) => (ex(g) ? p.pl[g] : gup(p, g)),
     row = (i, g, inp, pd, rst) =>
       `<tr data-i=${i}><td>${g}</td><td>${pd}</td><td>${inp}</td><td><input class=pe type=number step=any style="width:85px" oninput="rowIn(this,${i},'pe')"></td><td><input class=pf type=number step=any style="width:75px" oninput="rowIn(this,${i},'pf')"></td><td><input class=pp type=number step=any style="width:65px" oninput="rowIn(this,${i},'pp')"></td><td>${rst}</td></tr>`;
@@ -8894,13 +9003,22 @@ function prodForm(id, pre) {
         if (e && e.dataset.ex == '1' && z !== '') p.pl[g] = +z;
         else delete p.pl[g];
       });
+      if (pendImgUploading) {
+        toast('התמונה עדיין מועלת לענן, נסה שוב בעוד רגע');
+        return false;
+      }
       if (!id) {
         p.id = nid('p');
         S.products.push(p);
       }
       if (pendImg !== undefined) {
-        if (pendImg) IMG[p.id] = pendImg;
-        else delete IMG[p.id];
+        if (pendImg) {
+          IMG[p.id] = pendImg;
+          p.img = pendImg;
+        } else {
+          delete IMG[p.id];
+          p.img = '';
+        }
         imgSave();
         pendImg = undefined;
       }
@@ -9678,7 +9796,7 @@ function ledgerHtml(id) {
         key = 'i' + i.id,
         o = sxo.has(key),
         hasLn = i.ln && i.ln.length;
-      return `<tr class=ledr onclick="sxTog('${key}')"><td>${hasLn ? (o ? '▾' : '▸') : ''}</td><td>${D(i.t)}</td><td>${meta.lbl}</td><td>${esc(i.no)}</td><td>${ty != 'cr' && ty != 'dn' ? money(i.amt) : ''}</td><td>${ty == 'cr' ? money(i.amt) : ''}</td><td>${money(b)}</td><td onclick="event.stopPropagation()">${selectable ? `<input type=checkbox ${i.mark ? 'checked' : ''} onchange="mark(${i.id},this.checked)" title="בחירה">` : ''}</td><td onclick="event.stopPropagation()"><button onclick="edDoc(${i.id})" title="שינוי תאריך / מספר אסמכתא">✎</button><button onclick="dupPick(${id},${i.id})">שכפל</button>${ty == 'dn' ? ` <button class=pri onclick="dnConvert(${id},${i.id})" title="פתיחת אותם פריטים כחשבונית מס, ללא הוספה חוזרת למלאי שכבר נקלט">המר לחשבונית מס</button>` : ''}</td></tr>${
+      return `<tr class=ledr onclick="sxTog('${key}')"><td>${hasLn ? (o ? '▾' : '▸') : ''}</td><td>${D(i.t)}</td><td>${meta.lbl}</td><td>${esc(i.no)}</td><td>${ty != 'cr' && ty != 'dn' ? `<span class="${i.mark ? 'er' : ''}">${money(i.amt)}</span>` : ''}</td><td>${ty == 'cr' ? `<span class="${i.mark ? 'ok' : ''}">${money(i.amt)}</span>` : ''}</td><td>${money(b)}</td><td onclick="event.stopPropagation()">${selectable ? `<input type=checkbox ${i.mark ? 'checked' : ''} onchange="mark(${i.id},this.checked)" title="בחירה">` : ''}</td><td onclick="event.stopPropagation()"><button onclick="edDoc(${i.id})" title="שינוי תאריך / מספר אסמכתא">✎</button><button onclick="dupPick(${id},${i.id})">שכפל</button>${ty == 'dn' ? ` <button class=pri onclick="dnConvert(${id},${i.id})" title="פתיחת אותם פריטים כחשבונית מס, ללא הוספה חוזרת למלאי שכבר נקלט">המר לחשבונית מס</button>` : ''}</td></tr>${
         o
           ? `<tr><td colspan=9>${
               hasLn
@@ -9702,7 +9820,7 @@ function ledgerHtml(id) {
     b -= p.amt;
     return `<tr><td></td><td>${D(p.t)}</td><td>תשלום</td><td>${esc(payLabel(p))}</td><td></td><td>${money(p.amt)}</td><td>${money(b)}</td><td></td><td><button onclick="payf(${id},${p.t})">שכפל</button></td></tr>`;
   });
-  return `<div class=fg>${pn2('יתרת חוב/זכות', money(bal), bal > 0.5 ? 'er' : bal < -0.5 ? '' : '')}${pn2('רווח ממוצע ממוצרי הספק', pr.cnt ? pr.pct.toFixed(1) + '%' : '\u2014')}${sel.n ? pn2('נבחרו (' + sel.n + ') \u2013 סכום כולל זיכוי', money(sel.sum)) : ''}</div><p class=mu>${pr.cnt ? pr.cnt + ' שורות מכירה נכללו בחישוב הרווח הממוצע' : 'אין עדיין מכירות ממוצרי הספק'}</p>${sel.n ? `<div class=row><button onclick="selClr(${id})">נקה בחירה</button></div>` : ''}<div class=sc><table><thead><tr><th></th><th>תאריך</th><th>סוג</th><th>אסמכתא</th><th>חובה</th><th>זכות</th><th>יתרה</th><th>בחירה</th><th></th></tr></thead><tbody>${body || '<tr><td colspan=9 class=mu>אין תנועות</td></tr>'}</tbody></table></div>`;
+  return `<div class=fg>${pn2('יתרת חוב/זכות', money(bal), bal > 0.5 ? 'er' : bal < -0.5 ? 'ok' : '')}${pn2('רווח ממוצע ממוצרי הספק', pr.cnt ? pr.pct.toFixed(1) + '%' : '\u2014')}${sel.n ? pn2('נבחרו (' + sel.n + ') \u2013 סכום כולל ' + (sel.sum > 0.5 ? 'חוב' : sel.sum < -0.5 ? 'זכות' : ''), money(Math.abs(sel.sum)), sel.sum > 0.5 ? 'er' : sel.sum < -0.5 ? 'ok' : '') : ''}</div><p class=mu>${pr.cnt ? pr.cnt + ' שורות מכירה נכללו בחישוב הרווח הממוצע' : 'אין עדיין מכירות ממוצרי הספק'}</p>${sel.n ? `<div class=row><button class=pri onclick="payf(${id})">💸 רישום תשלום על הנבחר (${money(Math.abs(sel.sum))})</button><button onclick="selClr(${id})">נקה בחירה</button></div>` : ''}<div class=sc><table><thead><tr><th></th><th>תאריך</th><th>סוג</th><th>אסמכתא</th><th>חובה</th><th>זכות</th><th>יתרה</th><th>בחירה</th><th></th></tr></thead><tbody>${body || '<tr><td colspan=9 class=mu>אין תנועות</td></tr>'}</tbody></table></div>`;
 }
 // צבע סימון למסמך/שורת כרטסת לפי סוגה (חשבונית/זיכוי/תשלום).
 const selClr = (id) => {
@@ -13780,6 +13898,7 @@ function trackRep(nm) {
 }
 // goRep: ניווט ישיר למסך הדוחות עם דוח ספציפי פתוח (למשל מקישור בכרטיס לקוח/מוצר), עם סינון נקי.
 function goRep(cat, nm) {
+  if (!canTab('rep')) return toast('אין הרשאה לדוחות');
   snapF();
   tab = 'rep';
   rtop = cat;
@@ -14247,6 +14366,7 @@ async function syncPull() {
     try {
       localStorage.setItem(K, JSON.stringify(S));
     } catch (e) {}
+    await histCloudPull();
   } finally {
     cloudPulling = false;
   }
